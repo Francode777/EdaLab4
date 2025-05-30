@@ -1,0 +1,38 @@
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.List;
+
+
+public class AreaAttention {
+
+    private String AreaName;
+    private Queue<Patient> patientHeap;//mantiene los paciente ordenados por orden de llegada y urgencia --> atento con esto
+    private int maxCapacity;
+
+    AreaAttention(String AreaName, int maximumCapacity){// la cola para las pruebas se lo podemos dar de antemano ahi veremos
+        this.AreaName = AreaName;
+        this.maxCapacity = maximumCapacity;
+    }
+
+    void enterPatient(Patient patient){//usar heap
+
+    }
+
+    Boolean beSaturated(){
+        if(patientHeap.size() < maxCapacity)
+            return false;
+        else
+            return true;
+    }
+
+    List<Patient> getPatiensBytHeapSort(){// retornar pacientes por prioridad usando heap
+        List<Patient> patienByPriority = new ArrayList<Patient>();
+
+
+        return patienByPriority;
+    }
+
+
+
+
+}
