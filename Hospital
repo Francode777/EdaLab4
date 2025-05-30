@@ -1,0 +1,45 @@
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;// porque no toma el priorityQueue
+import java.util.List;
+
+public class Hospital {
+
+    private Map<String, Patient> totalPatient;
+    private PriorityQueue<Patient> attentionQueue; //gestiona a los pacientes en espera
+    //priorityQueue??
+    private Map<String, AreaAttention> areasAttention;// asignar paciente a areas especificas
+    private List<Patient> patientAttended;// pacientes para la casa
+
+    Hospital(){}
+
+    void registerPatient(Patient patient){// insertar paciente en COLA GENERAL y en la estructura de pacientes totales
+
+
+    }
+
+    void realiseCategory(String ID, int newCategory){
+
+
+    }
+
+    Patient nextpatient(){// extrae de la COLA GENERAL al paciente con mayor categoria
+        //IDEA: aplicar un tipo de ordenamiento por categoria y guardando los tiempos de espera, un idea!!!
+
+        return null;
+    }
+
+    List<Patient> getPatientsByCategory(int category){//lista de pacientes en espera de una determinada categoria
+
+        return null;
+    }
+
+    AreaAttention getArea(String nameArea){//devuelve el área correspondiente por nombre(no cache)
+
+        return null;
+    }
+
+
+
+
+}
