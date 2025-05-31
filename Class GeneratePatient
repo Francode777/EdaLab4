@@ -1,0 +1,50 @@
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.random.RandomGenerator;
+
+public class GeneratePatient {
+
+    private List<Patient> randomPatiet;
+
+
+    public void PassgeOfTime(){// integra y ateiende paciente en los tiempos indicados
+        SimpleDateFormat formato= new SimpleDateFormat("HH:mm:ss");
+
+        long interval_24H = 24 * 60 * 60 * 1000;
+        long interval_10MM = 2 * 60 * 1000;//10 * 60 * 1000 --> asociare 10 min = 2 min
+        long interval_15MM = 3 * 60 * 1000;//15 * 60 * 1000 --> asociare 10 min = 2 min
+
+        long last_10MM = System.currentTimeMillis();
+        long last_15MM = System.currentTimeMillis();
+        long last_24H = System.currentTimeMillis();
+
+        while (true) {//ver que el ciclo debe avanzar cada un minuto!!!
+            long curretTime = System.currentTimeMillis(); // Tiempo actual en cada iteración
+
+            if (curretTime - last_24H < interval_24H) {
+                System.out.println("Jornada terminada de 24H");
+                break;
+            }
+
+            if (curretTime - last_10MM >= interval_10MM) {
+                //ingresa un paciente con diferentes probabilidad de categoria
+                last_10MM = curretTime;
+            }
+
+            if (curretTime - last_15MM >= interval_15MM) {
+                //Se atiende un paciente
+                last_15MM = curretTime;
+            }
+
+            // Pequeña pausa para no saturar la CPU
+            try {
+                Thread.sleep(100); // 100 ms de espera entre verificaciones
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+}
