@@ -1,5 +1,6 @@
+import java.util.List;
 import java.util.Stack;
-
+import java.util.Random;
 
 public class Patient {//requiere atencion medica
     private String name;
@@ -15,8 +16,23 @@ public class Patient {//requiere atencion medica
         this.name = name;
         this.lastName = lastName;
         this.ID = ID;
-        //this.categoria = categoria; --> ingresar categoria de forma random por porcentaje de que salga
         this.arrivalTime = arrivalTime;
+
+        Random rand = new Random();
+
+        int rango = rand.nextInt(1,101);
+
+        if (rango <= 10)// 10%
+            this.categoria = 1;
+        else if (rango <= 25)// 15%
+            this.categoria = 2;
+        else if (rango <= 43)// 18%
+            this.categoria = 3;
+        else if (rango <= 70)// 27%
+            this.categoria = 4;
+        else // 30%
+            this.categoria = 5;
+
     }
 
     //metodos
@@ -24,7 +40,7 @@ public class Patient {//requiere atencion medica
     long curretTimeout() {//calcula el tiempo de espera del pobre enfermo o.0  --> ver TimeMillis
         //long passedTime = arrivalTime - System.currentTimeMillis();
 
-        return pastTense;//retorna el tiempo transcurrido
+        return 1;//retorna el tiempo transcurrido
     }
 
     void recordChange(){//cambia el historial del paciente -->ver cuando se cambia
@@ -32,7 +48,7 @@ public class Patient {//requiere atencion medica
 
     }
 
-    String  getLastChange(){//obtiene y remueve el ultimo cambio
+    public String  getLastChange(){//obtiene y remueve el ultimo cambio
         if(changeHistory.size() > 0)
             return changeHistory.pop();
         else
