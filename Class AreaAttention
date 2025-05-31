@@ -18,14 +18,14 @@ public class AreaAttention {
 
     }
 
-    Boolean beSaturated(){
+    public Boolean beSaturated(){
         if(patientHeap.size() < maxCapacity)
             return false;
         else
             return true;
     }
 
-    List<Patient> getPatiensBytHeapSort(){// retornar pacientes por prioridad usando heap
+    public List<Patient> getPatiensBytHeapSort(){// retornar pacientes por prioridad usando heap
         List<Patient> patienByPriority = new ArrayList<Patient>();
 
 
