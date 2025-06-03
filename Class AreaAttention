@@ -40,6 +40,7 @@ public int c(Paciente p1,Paciente p2) {
         } else {
             return 0;
         }
+}
     }
 };
 
