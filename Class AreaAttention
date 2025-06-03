@@ -1,22 +1,79 @@
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Comparator;
+
+
 
 
 public class AreaAttention {
 
-    private String AreaName;
-    private Queue<Patient> patientHeap;//mantiene los paciente ordenados por orden de llegada y urgencia --> atento con esto
-    private int maxCapacity;
+    private String nombre;
+    private PriorityQueue<Paciente> pacientesHeap;//mantiene los paciente ordenados por orden de llegada y urgencia --> atento con esto
+    private int capacidadMaxima;
 
-    AreaAttention(String AreaName, int maximumCapacity){// la cola para las pruebas se lo podemos dar de antemano ahi veremos
-        this.AreaName = AreaName;
-        this.maxCapacity = maximumCapacity;
+    AreaAttention(String nombre, int capacidadMaxima){// la cola para las pruebas se lo podemos dar de antemano ahi veremos
+        this.nombre = nombre;
+        this.capacidadMaxima = capacidadMaxima;
     }
 
-    void enterPatient(Patient patient){//usar heap
+    // usaré compare, entonces tengo que crear otra clase artificial
 
+     //-1 es p1 va antes que p2
+    //1 es p2 va antes que p1
+    //en caso de ser iguales seria 0, pero vamos a resolverlo con su orden de llegada
+
+   Comparator<Paciente> c = new Comparator<Paciente>() {
+public int c(Paciente p1,Paciente p2) {
+    if (p1.getCategoria() < p2.getCategoria()) {
+        return -1;
     }
+    if (p2.getCategoria() > p2.getCategoria()) {
+        return 1;
+    } else {//tienen la misma categoria, se resuelve en base a su orden de llegada
+        if (p1.getOrdenLlegada() < p2.getOrdenLlegada()) {
+            return -1;
+        }
+        if (p1.getOrdenLlegda() > p2.getOrdenLlegada()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+};
+
+
+
+    public PriorityQueue<Paciente> getPacientesHeap() {
+        return pacientesHeap;
+    }
+
+    Comparator<Paciente>ComparadorCategorias()
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public Boolean beSaturated(){
         if(patientHeap.size() < maxCapacity)
@@ -26,13 +83,32 @@ public class AreaAttention {
     }
 
     public List<Patient> getPatiensBytHeapSort(){// retornar pacientes por prioridad usando heap
-        List<Patient> patienByPriority = new ArrayList<Patient>();
+        List<Patient> patientByPriority = new ArrayList<Patient>();
 
 
-        return patienByPriority;
+        return patientByPriority;
     }
 
 
 
 
 }
+
+
+public int compare(Patient p1, Patient p2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
