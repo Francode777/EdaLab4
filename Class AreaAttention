@@ -1,111 +1,93 @@
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Comparator;
 
 
-
-
-public class AreaAttention {
+public class AreaAtencion{
 
     private String nombre;
     private PriorityQueue<Paciente> pacientesHeap;//mantiene los paciente ordenados por orden de llegada y urgencia --> atento con esto
     private int capacidadMaxima;
 
-    AreaAttention(String nombre, int capacidadMaxima){// la cola para las pruebas se lo podemos dar de antemano ahi veremos
+    public AreaAtencion(String nombre, int capacidadMaxima){// la cola para las pruebas se lo podemos dar de antemano ahi veremos
         this.nombre = nombre;
         this.capacidadMaxima = capacidadMaxima;
+        pacientesHeap = new PriorityQueue<Paciente>(c);
     }
 
     // usaré compare, entonces tengo que crear otra clase artificial
 
-     //-1 es p1 va antes que p2
+    //-1 es p1 va antes que p2
     //1 es p2 va antes que p1
-    //en caso de ser iguales seria 0, pero vamos a resolverlo con su orden de llegada
+    //en caso de ser iguales seria 0, pero vamos a resolverlo con su orden de llegada, o sea, viendo que quien lleva mas tiempo esperando
 
-   Comparator<Paciente> c = new Comparator<Paciente>() {
-public int c(Paciente p1,Paciente p2) {
-    if (p1.getCategoria() < p2.getCategoria()) {
-        return -1;
-    }
-    if (p2.getCategoria() > p2.getCategoria()) {
-        return 1;
-    } else {//tienen la misma categoria, se resuelve en base a su orden de llegada
-        if (p1.getOrdenLlegada() < p2.getOrdenLlegada()) {
-            return -1;
+    Comparator<Paciente> c = new Comparator<Paciente>() {
+        public int compare(Paciente p1, Paciente p2) {
+            if (p1.getCategoria() < p2.getCategoria()) {
+                return -1;
+            }
+            if (p1.getCategoria() > p2.getCategoria()) {
+                return 1;
+            } else {//tienen la misma categoria, se resuelve en base a su orden de llegada
+                if (p1.getOrdenLlegada() < p2.getOrdenLlegada()) {
+                    return -1;
+                }
+                if (p1.getOrdenLlegada() > p2.getOrdenLlegada()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
         }
-        if (p1.getOrdenLlegda() > p2.getOrdenLlegada()) {
-            return 1;
-        } else {
-            return 0;
+    };
+
+
+   /*
+este es un ejemplo de como se veria el heap, podemos ver que el Fran es el que esta con mas urgencia con C1 y un tiempo de llegada
+anterior a los demas a pesar de que Guliano por ejemplo tenga su misma categoria de urgencia. Por ende al hacer el poll() mandará la cabeza,
+que es Fran con C1 y su tiempo de llegada inferior al de Guliano.
+
+
+              Fran (C1, 900)
+            /               \
+   Guliano (C1, 950)     Javiera (C3, 1000)
+                          /
+              Nasheee (C4, 1010)
+
+    */
+
+
+    public boolean estaSaturada(){
+        return pacientesHeap.size() >= capacidadMaxima;
+    }
+
+    public void ingresarPaciente(Paciente paciente){
+        if(estaSaturada()){
+            System.out.println("Se alcanzó la capacidad maxima en el área" + nombre);
         }
-}
-    }
-};
+//usaré offer en vez de add para que devuelva false en caso de que no se agregue en vez de que el code se rompa por un error
+        else{ pacientesHeap.offer(paciente); }}
 
 
 
-    public PriorityQueue<Paciente> getPacientesHeap() {
-        return pacientesHeap;
-    }
-
-    Comparator<Paciente>ComparadorCategorias()
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public Boolean beSaturated(){
-        if(patientHeap.size() < maxCapacity)
-            return false;
-        else
-            return true;
-    }
-
-    public List<Patient> getPatiensBytHeapSort(){// retornar pacientes por prioridad usando heap
-        List<Patient> patientByPriority = new ArrayList<Patient>();
-
-
-        return patientByPriority;
+    public Paciente atenderPaciente(){
+        return pacientesHeap.poll();  //retorna la cabeza
     }
 
 
 
+    public List<Paciente> obtenerPacientesPorHeapSort(){
+        PriorityQueue<Paciente> aux= new PriorityQueue<Paciente>(pacientesHeap); //creamos un auxiliar para no modificar el original
 
-}
+        List<Paciente> ordenados= new ArrayList<Paciente>();
 
+        while(!aux.isEmpty()){
+            ordenados.add(aux.poll()); //ahora al ser una lista se usa add, offer solo usamos en colas
+        }
 
-public int compare(Patient p1, Patient p2)
-
-
-
-
-
-
-
-
-
+        return ordenados;
+    }
 
 
 
