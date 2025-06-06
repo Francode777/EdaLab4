@@ -10,12 +10,6 @@ public class AreaAttention {
     private PriorityQueue<Patient> patientHeap;//mantiene los paciente ordenados por orden de llegada y urgencia --> atento con esto
     private int maxCapacity;
 
-    public AreaAttention(String name, int maxCapacity) {// la cola para las pruebas se lo podemos dar de antemano ahi veremos
-        this.name = name;
-        this.maxCapacity = maxCapacity;
-        patientHeap = new PriorityQueue<Patient>(c);
-    }
-
     // usaré compare, entonces tengo que crear otra clase artificial
 
     //-1 es p1 va antes que p2
@@ -57,6 +51,12 @@ que es Fran con C1 y su tiempo de llegada inferior al de Guliano.
 
     */
 
+    public AreaAttention(String name, int maxCapacity) {// la cola para las pruebas se lo podemos dar de antemano ahi veremos
+        this.name = name;
+        this.maxCapacity = maxCapacity;
+        patientHeap = new PriorityQueue<Patient>(c);
+    }
+
     public void addPatient(Patient paciente) {
         if (thisSaturade()) {
             System.out.println("Se alcanzó la capacidad maxima en el área" + name);
@@ -64,15 +64,15 @@ que es Fran con C1 y su tiempo de llegada inferior al de Guliano.
             patientHeap.offer(paciente);
         }
     }
-
     public Patient attendPatient() {
-        return patientHeap.poll();  //retorna la cabeza
+        Patient p = patientHeap.peek();
+        p.setState(0);
+        p.recordChange(-1);
+        return patientHeap.poll();
     }
-
     public boolean thisSaturade() {
         return patientHeap.size() >= maxCapacity;
     }
-
     public List<Patient> obtenerPacientesPorHeapSort() {
         PriorityQueue<Patient> aux = new PriorityQueue<Patient>(patientHeap); //creamos un auxiliar para no modificar el original
 
