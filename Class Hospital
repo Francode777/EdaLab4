@@ -1,81 +1,66 @@
 import java.text.SimpleDateFormat;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;// porque no toma el priorityQueue(porque viene default al java)
-import java.util.List;
-
+import java.util.*;
+import java.util.ArrayList;
 public class Hospital {
 
     private Map<String, Patient> totalPatient;
     private PriorityQueue<Patient> attentionQueue; //gestiona a los pacientes en espera
-    //priorityQueue??
     private Map<String, AreaAttention> areasAttention;// asignar paciente a areas especificas
     private List<Patient> patientAttended;// pacientes para la casa
 
-    Hospital(){}
-
-    void registerPatient(Patient patient){// insertar paciente en COLA GENERAL y en la estructura de pacientes totales
-        System.currentTimeMillis();
-
-    }
-
-    void realiseCategory(String ID, int newCategory){
-
-
-    }
-
-    public Patient nextpatient(){// extrae de la COLA GENERAL al paciente con mayor categoria
-        //IDEA: aplicar un tipo de ordenamiento por categoria y guardando los tiempos de espera, un idea!!!
-
-        return null;
-    }
-
-    public List<Patient> getPatientsByCategory(int category){//lista de pacientes en espera de una determinada categoria
-
-        return null;
-    }
-
-    public AreaAttention getArea(String nameArea){//devuelve el área correspondiente por nombre(no cache)
-
-        return null;
-    }
-
-    public void PassgeOfTime(){// integra y ateiende paciente en los tiempos indicados
-        SimpleDateFormat formato= new SimpleDateFormat("HH:mm:ss");
-
-        long interval_24H = 24 * 60 * 60 * 1000;
-        long interval_10MM = 2 * 60 * 1000;//10 * 60 * 1000 --> asociare 10 min = 2 min
-        long interval_15MM = 3 * 60 * 1000;//15 * 60 * 1000 --> asociare 10 min = 2 min
-
-        long last_10MM = System.currentTimeMillis();
-        long last_15MM = System.currentTimeMillis();
-        long last_24H = System.currentTimeMillis();
-
-        while (true) {//ver que el ciclo debe avanzar cada un minuto!!!
-            long curretTime = System.currentTimeMillis(); // Tiempo actual en cada iteración
-
-            if (curretTime - last_24H < interval_24H) {
-                System.out.println("Jornada terminada de 24H");
-                break;
-            }
-
-            if (curretTime - last_10MM >= interval_10MM) {
-                //ingresa un paciente con diferentes probabilidad de categoria
-                last_10MM = curretTime;
-            }
-
-            if (curretTime - last_15MM >= interval_15MM) {
-                //Se atiende un paciente
-                last_15MM = curretTime;
-            }
-
-            // Pequeña pausa para no saturar la CPU
-            try {
-                Thread.sleep(100); // 100 ms de espera entre verificaciones
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    Hospital(){
+        int[] capacity = {30,90,120,200};
+        for (int i = 1; i <= 5; i++) {
+            String areaName = "C" + i;
+            areasAttention.put(areaName, new AreaAttention(areaName, capacity[i]));
         }
     }
+
+    void registerPatient(Patient patient){
+        String id = patient.getID();
+        totalPatient.put(id, patient);
+        attentionQueue.add(patient);
+        // asigna su categoria y su area de atencion?
+    }
+    void realiseCategory(String ID, int newCategory){
+        Patient patient = totalPatient.get(ID);
+        patient.setCategory(newCategory);
+        patient.recordChange();
+    }
+    public Patient nextpatient(){
+        if(attentionQueue.isEmpty()){
+            System.out.println("No patients attention available");
+            return null;
+        }
+
+        Patient patient = attentionQueue.poll();// deberia ya estar ordenado
+        int category = patient.getCategoria();
+        String areaName = "C" + category;
+
+        AreaAttention area = areasAttention.get(areaName);
+
+        if(area != null){
+            area.ingresarPaciente(patient);
+            System.out.println("Paciente " + patient.getID() + " asignado a área " + areaName);
+        }else {
+            System.out.println("Área " + areaName + " no encontrada.");
+        }
+
+        return null;
+    }
+
+    public List<Patient> getPatientsByCategory(int category){//saca al de mayor categoria y lo asigna a su area???
+
+        return null;
+    }
+
+    public AreaAttention getArea(String nameArea){
+    //devuelve el área correspondiente por nombre(problema que veo es que si hay mas de una persona con ese nombre,
+        // imagino que se pide nombre y apellido, el cual tambien se puede repitir por lo cual es un posible problema)
+
+        return null;
+    }
+
+
 
 }
