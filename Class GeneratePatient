@@ -1,50 +1,115 @@
-import java.text.SimpleDateFormat;
+import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.random.RandomGenerator;
+import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.FileWriter;
 
 public class GeneratePatient {
 
-    private List<Patient> randomPatiet;
+    private static String[] names = {
+            "Guliano", "Javiera", "Francisco", "Benjamin", "Ronal",
+            "Samuel", "Agustin", "Lucía", "Diego", "Camila",
+            "Mateo", "Valentina", "Andrés", "Cristian", "Tomás",
+            "Elena", "Gabriel", "Isabella", "Samuel", "Martina"
+    };
+    private static String[] lastNames = {
+            "Bardi", "Olguin", "Gatica", "López", "Martínez",
+            "Sánchez", "Ramírez", "Cruz", "Olmos", "Díaz",
+            "Torres", "Vargas", "Castillo", "Morales", "Ortiz",
+            "Flores", "Ruiz", "Medina", "Herrera", "Silva"
+    };
+    private static String[] areas = {
+            "Sapu", "Urgencia Adulto", "infantil", "Adulto Mayor"
+    };
+    private static String prefijo = "A";
+    private static int counter = 1;
+    private static long timestamp_inicio = 0;
+    private static Random random = new Random();
 
+    public GeneratePatient() {}
 
-    public void PassgeOfTime(){// integra y ateiende paciente en los tiempos indicados
-        SimpleDateFormat formato= new SimpleDateFormat("HH:mm:ss");
+    public static List<Patient> generatePatient(int cantidad) {
 
-        long interval_24H = 24 * 60 * 60 * 1000;
-        long interval_10MM = 2 * 60 * 1000;//10 * 60 * 1000 --> asociare 10 min = 2 min
-        long interval_15MM = 3 * 60 * 1000;//15 * 60 * 1000 --> asociare 10 min = 2 min
+        List<Patient> patientsRandom = new ArrayList<>();
 
-        long last_10MM = System.currentTimeMillis();
-        long last_15MM = System.currentTimeMillis();
-        long last_24H = System.currentTimeMillis();
+        for (int i = 1; i <= cantidad; i++) {
 
-        while (true) {//ver que el ciclo debe avanzar cada un minuto!!!
-            long curretTime = System.currentTimeMillis(); // Tiempo actual en cada iteración
+            String name= names[random.nextInt(names.length)];
+            String lastname = lastNames[random.nextInt(lastNames.length)];
+            String id = prefijo + String.format("%04d",counter);
+            long timestamp = timestamp_inicio + (i * 10 * 60* 1000);
+            String area = areas[random.nextInt(areas.length)];
 
-            if (curretTime - last_24H < interval_24H) {
-                System.out.println("Jornada terminada de 24H");
-                break;
+            Patient p = new Patient(name, lastname, id, timestamp, area);
+            patientsRandom.add(p);
+
+            counter++;
+        }
+
+        return patientsRandom;
+    }
+
+    public static void guardarDatos(List<Patient> patients, String nombreArchivo) {
+
+        try(FileWriter writer = new FileWriter(nombreArchivo)) {
+
+            writer.write("Nombre, Apellido, Id, Tiempo de llegada, Area \n");// encabezados de columans
+
+            for (Patient p : patients) {
+                writer.write(p.getName() + "," + p.getLastName() + "," +
+                        p.getID() + "," + p.getArrivalTime() + "," + p.getArea() + "\n");
             }
 
-            if (curretTime - last_10MM >= interval_10MM) {
-                //ingresa un paciente con diferentes probabilidad de categoria
-                last_10MM = curretTime;
-            }
+            System.out.println("El Archivo " + nombreArchivo + " ha sido guardado correctamente.");
 
-            if (curretTime - last_15MM >= interval_15MM) {
-                //Se atiende un paciente
-                last_15MM = curretTime;
-            }
-
-            // Pequeña pausa para no saturar la CPU
-            try {
-                Thread.sleep(100); // 100 ms de espera entre verificaciones
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        }catch(IOException e) {
+            System.err.println("Error al guardar el archivo: " + e.getMessage());
         }
     }
 
+    public static ArrayList<Patient> leerDatos(String nombreArchivo) {
 
+        ArrayList<Patient> patientRandom = new ArrayList<>();
 
+        try (BufferedReader br = new BufferedReader(new FileReader(nombreArchivo))) {// leer linea por linea
+            String linea = br.readLine();
+
+            while ((linea = br.readLine()) != null) {
+                String[] parts = linea.split(",");
+
+                if (parts.length == 5) {
+                    String name = parts[0].trim();
+                    String lastname = parts[1].trim();
+                    String id = parts[2].trim();
+                    int arrivalTime = Integer.parseInt(parts[3].trim());
+                    String area = parts[4].trim();
+
+                    patientRandom.add(new Patient(name,lastname,id,arrivalTime, area));
+                }
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error al leer el archivo: " + e.getMessage());
+        }
+        return patientRandom;
+    }
+    public static void main(String[] args) {
+
+        List<Patient> listPatient = GeneratePatient.generatePatient(1000);
+        guardarDatos(listPatient, "Pacientes_24H.txt");
+
+        /*
+        //para leer los juegos
+        List<Patient> patientList = GeneratePatient.leerDatos("Pacientes_24H.csv");
+
+        for (int i = 0; i < juegos.size(); i++) {
+            System.out.println((i + 1) + ") : " + juegos.get(i).imprimir());
+        }
+        */
+
+    }
 }
+
