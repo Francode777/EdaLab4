@@ -9,7 +9,7 @@ public class Patient {//requiere atencion medica
     private String ID;
     private int categoria;
     private long arrivalTime;
-    private String state;
+    private String state;// en_espera, en_atencion, atendido
     private String area;// valor donde debe ser atendido
     private Stack<String> changeHistory;//vera la categoria que ira cambaidno el paciente
 
@@ -57,8 +57,22 @@ public class Patient {//requiere atencion medica
     public String getArea() {
         return area;
     }
+    public String getState() {
+        return state;
+    }
+    public void setArea(String area) {
+        this.area = area;
+    }
     public void setCategory(int newCategory) {
         categoria = newCategory;
+    }
+    public void setState (int newState) {
+        String[] estados = {"En atencion", "Atendido"};
+        if (newState >= 0 && newState < estados.length) {
+            this.state = estados[newState];
+        } else {
+            throw new IllegalArgumentException("Estado inválido: " + newState);
+        }
     }
     public long curretTimeout(){// relacion con WorkingDay
         return System.currentTimeMillis() - arrivalTime;
@@ -69,8 +83,16 @@ public class Patient {//requiere atencion medica
         else
             return "No se encuentran cambios disponibles";
     }
-    public void recordChange(){
-        changeHistory.push("Cambio a categorio " + categoria);//ojo
+    public void recordChange(int categoria){
+        if(categoria == -1) {
+            changeHistory.push("Paciente en atencion ");
+        }else if(categoria == -2){
+            changeHistory.push("Paciente atendido");
+        }else if(categoria > 0 && categoria < 6){
+            changeHistory.push("cambio de categoria: C" + categoria);
+        }else{
+            throw new IllegalArgumentException("Estado inválido: " + categoria);
+        }
     }
 
 
