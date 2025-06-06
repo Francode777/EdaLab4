@@ -8,24 +8,47 @@ public class Hospital {
     private Map<String, AreaAttention> areasAttention;// asignar paciente a areas especificas
     private List<Patient> patientAttended;// pacientes para la casa
 
-    Hospital(){
-        int[] capacity = {30,90,120,200};
-        for (int i = 1; i <= 5; i++) {
-            String areaName = "C" + i;
-            areasAttention.put(areaName, new AreaAttention(areaName, capacity[i]));
+    Hospital() {
+        this.totalPatient = new HashMap<>();
+        this.areasAttention = new HashMap<>();
+        this.patientAttended = new ArrayList<>();
+
+        areasAttention.put("SAPU", new AreaAttention("SAPU", 90));
+        areasAttention.put("urgencia_adulto", new AreaAttention("urgencia_adulto", 120));
+        areasAttention.put("infantil", new AreaAttention("infantil", 100));
+
+        this.attentionQueue = new PriorityQueue<>(new compare());
+        /*
+        public int compare(Patient p1, Patient p2) {
+            if (p1.getCategoria() != p2.getCategoria()) {
+                return Integer.compare(p1.getCategoria(), p2.getCategoria());
+            }
+            return Long.compare(p1.getArrivalTime(), p2.getArrivalTime());
         }
+        */
     }
 
     void registerPatient(Patient patient){
         String id = patient.getID();
         totalPatient.put(id, patient);
+
+        String area = determinarAreaSegunCategoria(patient.getCategoria());
+        patient.setArea(area);
+
         attentionQueue.add(patient);
         // asigna su categoria y su area de atencion?
     }
+
+    private String determinarAreaSegunCategoria(int categoria) {// una forma para asignarle un area en especifica
+        if (categoria == 1 || categoria == 2) return "urgencia_adulto";
+        else if (categoria == 3 || categoria == 4) return "SAPU";
+        else return "infantil";
+    }
+
     void realiseCategory(String ID, int newCategory){
         Patient patient = totalPatient.get(ID);
         patient.setCategory(newCategory);
-        patient.recordChange();
+        patient.recordChange(newCategory);
     }
     public Patient nextpatient(){
         if(attentionQueue.isEmpty()){
@@ -49,16 +72,25 @@ public class Hospital {
         return null;
     }
 
-    public List<Patient> getPatientsByCategory(int category){//saca al de mayor categoria y lo asigna a su area???
+    public List<Patient> obtenerPacientesPorCategoria(int categoria){
+        List<Patient> pacientesFiltrados = new ArrayList<>();
 
-        return null;
+        for (Patient paciente : attentionQueue) {
+            if (paciente.getCategoria() == categoria && paciente.getState().equals("En espera")) {
+                pacientesFiltrados.add(paciente);
+            }
+        }
+
+        return pacientesFiltrados;
     }
 
     public AreaAttention getArea(String nameArea){
-    //devuelve el área correspondiente por nombre(problema que veo es que si hay mas de una persona con ese nombre,
-        // imagino que se pide nombre y apellido, el cual tambien se puede repitir por lo cual es un posible problema)
-
-        return null;
+        if (areasAttention.containsKey(nameArea)) {
+            return areasAttention.get(nameArea);
+        } else {
+            System.out.println("Área no encontrada: " + nameArea);
+            return null;
+        }
     }
 
 
