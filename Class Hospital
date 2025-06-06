@@ -40,7 +40,7 @@ public class Hospital {
         AreaAttention area = areasAttention.get(areaName);
 
         if(area != null){
-            area.ingresarPaciente(patient);
+            area.addPatient(patient);
             System.out.println("Paciente " + patient.getID() + " asignado a área " + areaName);
         }else {
             System.out.println("Área " + areaName + " no encontrada.");
