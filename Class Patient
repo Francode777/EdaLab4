@@ -5,19 +5,22 @@ import java.util.Random;
 public class Patient {//requiere atencion medica
     private String name;
     private String lastName;
+    private String fullName = name + " " + lastName;
     private String ID;
     private int categoria;
     private long arrivalTime;
     private String state;
-    private String area;
+    private String area;// valor donde debe ser atendido
     private Stack<String> changeHistory;//vera la categoria que ira cambaidno el paciente
 
-    Patient(String name, String lastName, String ID, long arrivalTime) {
+    Patient(String name, String lastName, String ID, long arrivalTime, String area) {
         this.name = name;
         this.lastName = lastName;
         this.ID = ID;
         this.arrivalTime = arrivalTime;
-
+        this.state = "En espera";
+        this.changeHistory = new Stack<>();
+        this.area = area;
         Random rand = new Random();
 
         int rango = rand.nextInt(1,101);
@@ -36,24 +39,40 @@ public class Patient {//requiere atencion medica
     }
 
     //metodos
-
-    long curretTimeout() {//calcula el tiempo de espera del pobre enfermo o.0  --> ver TimeMillis
-        //long passedTime = arrivalTime - System.currentTimeMillis();
-
-        return 1;//retorna el tiempo transcurrido
+    public String getName() {
+        return name;
     }
-
-    void recordChange(){//cambia el historial del paciente -->ver cuando se cambia
-
-
+    public String getLastName() {
+        return lastName;
     }
-
+    public String getID(){
+        return ID;
+    }
+    public int getCategoria(){
+        return categoria;
+    }
+    public long getArrivalTime(){
+        return arrivalTime;
+    }
+    public String getArea() {
+        return area;
+    }
+    public void setCategory(int newCategory) {
+        categoria = newCategory;
+    }
+    public long curretTimeout(){// relacion con WorkingDay
+        return System.currentTimeMillis() - arrivalTime;
+    }
     public String  getLastChange(){//obtiene y remueve el ultimo cambio
         if(changeHistory.size() > 0)
             return changeHistory.pop();
         else
             return "No se encuentran cambios disponibles";
     }
+    public void recordChange(){
+        changeHistory.push("Cambio a categorio " + categoria);//ojo
+    }
+
 
 
 }
