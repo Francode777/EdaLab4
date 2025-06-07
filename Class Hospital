@@ -8,41 +8,54 @@ public class Hospital {
     private Map<String, AreaAttention> areasAttention;// asignar paciente a areas especificas
     private List<Patient> patientAttended;// pacientes para la casa
 
+    Comparator<Patient> c = new Comparator<Patient>() {//evaluar los peores caso para el informe
+        public int compare(Patient p1, Patient p2) {
+            if (p1.getCategoria() < p2.getCategoria()) {
+                return -1;
+            }
+            if (p1.getCategoria() > p2.getCategoria()) {
+                return 1;
+            } else {//tienen la misma categoria, se resuelve en base a su orden de llegada
+                if (p1.getArrivalTime() < p2.getArrivalTime()) {//pendiente-> posible solucion crear un metodo que compare la horas
+                    return -1;
+                }
+                if (p1.getArrivalTime() > p2.getArrivalTime()) {//pendiente
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+    };
+
     Hospital() {
         this.totalPatient = new HashMap<>();
         this.areasAttention = new HashMap<>();
         this.patientAttended = new ArrayList<>();
-
-        areasAttention.put("SAPU", new AreaAttention("SAPU", 90));
-        areasAttention.put("urgencia_adulto", new AreaAttention("urgencia_adulto", 120));
-        areasAttention.put("infantil", new AreaAttention("infantil", 100));
-
-        this.attentionQueue = new PriorityQueue<>(new compare());
-        /*
-        public int compare(Patient p1, Patient p2) {
-            if (p1.getCategoria() != p2.getCategoria()) {
-                return Integer.compare(p1.getCategoria(), p2.getCategoria());
-            }
-            return Long.compare(p1.getArrivalTime(), p2.getArrivalTime());
+        this.attentionQueue = new PriorityQueue<>(c);
+        String[] areas = {"Sapu", "Infantil", "irgencia_adulto"};
+        int[] capacity = {90, 200, 300};
+                
+        for (int i = 0; i < areas.length; i++) {
+            areasAttention.put(areas[i], new AreaAttention(areas[i], capacity[i]));
         }
-        */
     }
-
-    void registerPatient(Patient patient){
+    
+    private String DetermineAreaAccordingCategory(int categoria) {// una forma para asignarle un area en especifica
+        if (categoria == 1 || categoria == 2) return "urgencia_adulto";
+        else if (categoria == 3 || categoria == 4) return "SAPU";
+        else return "infantil";
+    }
+    
+    void registerPatient(Patient patient){//usar para la simulacion
         String id = patient.getID();
         totalPatient.put(id, patient);
 
-        String area = determinarAreaSegunCategoria(patient.getCategoria());
+        String area = DetermineAreaAccordingCategory(patient.getCategoria());
         patient.setArea(area);
 
         attentionQueue.add(patient);
         // asigna su categoria y su area de atencion?
-    }
-
-    private String determinarAreaSegunCategoria(int categoria) {// una forma para asignarle un area en especifica
-        if (categoria == 1 || categoria == 2) return "urgencia_adulto";
-        else if (categoria == 3 || categoria == 4) return "SAPU";
-        else return "infantil";
     }
 
     void realiseCategory(String ID, int newCategory){
@@ -50,16 +63,16 @@ public class Hospital {
         patient.setCategory(newCategory);
         patient.recordChange(newCategory);
     }
+    
     public Patient nextpatient(){
+
         if(attentionQueue.isEmpty()){
             System.out.println("No patients attention available");
             return null;
         }
 
         Patient patient = attentionQueue.poll();// deberia ya estar ordenado
-        int category = patient.getCategoria();
-        String areaName = "C" + category;
-
+        String areaName = DetermineAreaAccordingCategory(patient.getCategoria());
         AreaAttention area = areasAttention.get(areaName);
 
         if(area != null){
