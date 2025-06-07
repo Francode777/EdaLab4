@@ -1,17 +1,15 @@
-import java.util.List;
-import java.util.Stack;
-import java.util.Random;
+import java.util.*;
 
-public class Patient {//requiere atencion medica
+
+class Patient {
     private String name;
     private String lastName;
-    private String fullName = name + " " + lastName;
-    private String ID;
-    private int categoria;
+    private String ID; //rut
+    private int categoria; // del 1 al 5 C1-C5
     private long arrivalTime;
-    private String state;// en_espera, en_atencion, atendido
-    private String area;// valor donde debe ser atendido
-    private Stack<String> changeHistory;//vera la categoria que ira cambaidno el paciente
+    private String state;
+    private String area;
+    private Stack<String> changeHistory;//categoria que ira cambaidno el paciente
 
     Patient(String name, String lastName, String ID, long arrivalTime) {
         this.name = name;
@@ -19,11 +17,11 @@ public class Patient {//requiere atencion medica
         this.ID = ID;
         this.arrivalTime = arrivalTime;
         this.state = "En espera";
+        this.area = "Sin asignar";
         this.changeHistory = new Stack<>();
-        this.area = "";
         Random rand = new Random();
 
-        int rango = rand.nextInt(1,101);
+        int rango = rand.nextInt(1, 101);
 
         if (rango <= 10)// 10%
             this.categoria = 1;
@@ -37,21 +35,22 @@ public class Patient {//requiere atencion medica
             this.categoria = 5;
 
     }
-
-    //metodos
     public String getName() {
         return name;
     }
+
     public String getLastName() {
         return lastName;
     }
-    public String getID(){
+
+    public String getID() {
         return ID;
     }
-    public int getCategoria(){
+    int getCategoria() {
         return categoria;
     }
-    public long getArrivalTime(){
+
+    public long getArrivalTime() {
         return arrivalTime;
     }
     public String getArea() {
@@ -60,34 +59,47 @@ public class Patient {//requiere atencion medica
     public String getState() {
         return state;
     }
+
+    public Stack<String> getChangeHistory() {
+        return changeHistory;
+    }
+
     public void setArea(String area) {
         this.area = area;
     }
+
     public void setCategory(int newCategory) {
-    this.categoria = newCategory;
-    recordChange("Categoria cambiada a C" + newCategory );
+        this.categoria = newCategory;
+        recordChange("Categoria cambiada a C" + newCategory);
     }
-    public void setState (int newState) {
-        String[] estados = {"En atencion", "Atendido"};
-        if (newState >= 0 && newState < estados.length) {
-            this.state = estados[newState];
-        recordChange("Estado cambiado a: " + newState );
-        } else {
-            throw new IllegalArgumentException("Estado inválido: " + newState);
+    public void setState(String newState) {
+        List<String> EV = Arrays.asList("En atencion", "Atendido");//estados validos
+        if(EV.contains(newState)){
+            this.state = newState;
+            recordChange("Estado cambiada a " + newState);
+        }else{
+            throw new IllegalArgumentException("Estado invalido");
         }
     }
-    public long curretTimeout(){// relacion con WorkingDay
-        return System.currentTimeMillis() - arrivalTime;
+
+    public String fullName() {
+        return name + " " + lastName;
     }
-    public String  getLastChange(){//obtiene y remueve el ultimo cambio
-        if(changeHistory.size() > 0)
+    public long currentTimeout() {
+        return (long) (System.currentTimeMillis() - arrivalTime) / 60000;
+
+    }
+
+    public void recordChange(String descripcion){//cambia el historial del paciente
+        changeHistory.push(descripcion);//pila que registra cambios
+    }
+
+    public String getLastChange() {//obtiene y remueve el ultimo cambio
+        if (changeHistory.size() > 0) {
             return changeHistory.pop();
-        else
+        } else {
             return "No se encuentran cambios disponibles";
+        }
     }
-
-public void recordChange(String descripcion){
-changeHistory.push(descripcion);
-
 }
-}
+
