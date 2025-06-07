@@ -22,14 +22,12 @@ public class GeneratePatient {
             "Flores", "Ruiz", "Medina", "Herrera", "Silva"
     };
     private static String[] areas = {
-            "Sapu", "Urgencia Adulto", "infantil", "Adulto Mayor"
+            "Sapu", "Urgencia Adulto", "infantil"
     };
     private static String prefijo = "A";
     private static int counter = 1;
     private static long timestamp_inicio = 0;
     private static Random random = new Random();
-
-    public GeneratePatient() {}
 
     public static List<Patient> generatePatient(int cantidad) {
 
@@ -41,9 +39,8 @@ public class GeneratePatient {
             String lastname = lastNames[random.nextInt(lastNames.length)];
             String id = prefijo + String.format("%04d",counter);
             long timestamp = timestamp_inicio + (i * 10 * 60* 1000);
-            String area = areas[random.nextInt(areas.length)];
 
-            Patient p = new Patient(name, lastname, id, timestamp, area);
+            Patient p = new Patient(name, lastname, id, timestamp);
             patientsRandom.add(p);
 
             counter++;
@@ -56,11 +53,11 @@ public class GeneratePatient {
 
         try(FileWriter writer = new FileWriter(nombreArchivo)) {
 
-            writer.write("Nombre, Apellido, Id, Tiempo de llegada, Area \n");// encabezados de columans
+            writer.write("Nombre, Apellido, Id, Tiempo de llegada \n");// encabezados de columans
 
             for (Patient p : patients) {
                 writer.write(p.getName() + "," + p.getLastName() + "," +
-                        p.getID() + "," + p.getArrivalTime() + "," + p.getArea() + "\n");
+                        p.getID() + "," + p.getArrivalTime() + "\n");
             }
 
             System.out.println("El Archivo " + nombreArchivo + " ha sido guardado correctamente.");
@@ -85,9 +82,8 @@ public class GeneratePatient {
                     String lastname = parts[1].trim();
                     String id = parts[2].trim();
                     int arrivalTime = Integer.parseInt(parts[3].trim());
-                    String area = parts[4].trim();
 
-                    patientRandom.add(new Patient(name,lastname,id,arrivalTime, area));
+                    patientRandom.add(new Patient(name,lastname,id,arrivalTime));
                 }
             }
 
