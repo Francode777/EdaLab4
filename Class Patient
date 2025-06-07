@@ -87,7 +87,7 @@ public class Patient {//requiere atencion medica
     }
 
 public void recordChange(String descripcion){
-changeHistory.push("cambio"+ descripcion);
+changeHistory.push(descripcion);
 
 }
 }
