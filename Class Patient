@@ -13,14 +13,14 @@ public class Patient {//requiere atencion medica
     private String area;// valor donde debe ser atendido
     private Stack<String> changeHistory;//vera la categoria que ira cambaidno el paciente
 
-    Patient(String name, String lastName, String ID, long arrivalTime, String area) {
+    Patient(String name, String lastName, String ID, long arrivalTime) {
         this.name = name;
         this.lastName = lastName;
         this.ID = ID;
         this.arrivalTime = arrivalTime;
         this.state = "En espera";
         this.changeHistory = new Stack<>();
-        this.area = area;
+        this.area = "";
         Random rand = new Random();
 
         int rango = rand.nextInt(1,101);
