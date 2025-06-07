@@ -71,6 +71,7 @@ public class Patient {//requiere atencion medica
         String[] estados = {"En atencion", "Atendido"};
         if (newState >= 0 && newState < estados.length) {
             this.state = estados[newState];
+        recordChange("Estado cambiado a: " + newState );
         } else {
             throw new IllegalArgumentException("Estado inválido: " + newState);
         }
