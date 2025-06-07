@@ -64,7 +64,8 @@ public class Patient {//requiere atencion medica
         this.area = area;
     }
     public void setCategory(int newCategory) {
-        categoria = newCategory;
+    this.categoria = newCategory;
+    recordChange("Categoria cambiada a C" + newCategory );
     }
     public void setState (int newState) {
         String[] estados = {"En atencion", "Atendido"};
@@ -83,18 +84,9 @@ public class Patient {//requiere atencion medica
         else
             return "No se encuentran cambios disponibles";
     }
-    public void recordChange(int categoria){
-        if(categoria == -1) {
-            changeHistory.push("Paciente en atencion ");
-        }else if(categoria == -2){
-            changeHistory.push("Paciente atendido");
-        }else if(categoria > 0 && categoria < 6){
-            changeHistory.push("cambio de categoria: C" + categoria);
-        }else{
-            throw new IllegalArgumentException("Estado inválido: " + categoria);
-        }
-    }
 
+public void recordChange(String descripcion){
+changeHistory.push("cambio"+ descripcion);
 
-
+}
 }
