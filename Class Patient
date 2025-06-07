@@ -9,7 +9,7 @@ class Patient {
     private long arrivalTime;
     private String state;
     private String area;
-    private Stack<String> changeHistory;//categoria que ira cambaidno el paciente
+    private Stack<String> changeHistory;//registro cambios en estado o categoria
 
     Patient(String name, String lastName, String ID, long arrivalTime) {
         this.name = name;
