@@ -67,7 +67,7 @@ que es Fran con C1 y su tiempo de llegada inferior al de Guliano.
     public Patient attendPatient() {
         Patient p = patientHeap.peek();
         p.setState(0);
-        p.recordChange(-1);
+        p.recordChange("Atendido");
         return patientHeap.poll();
     }
     public boolean thisSaturade() {
