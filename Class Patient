@@ -38,18 +38,18 @@ class Patient {
     public String getName() {
         return name;
     }
-
     public String getLastName() {
         return lastName;
     }
-
+    public String getFullName() {
+        return name + " " + lastName;
+    }
     public String getID() {
         return ID;
     }
-    int getCategoria() {
+    public int getCategoria() {
         return categoria;
     }
-
     public long getArrivalTime() {
         return arrivalTime;
     }
@@ -59,19 +59,18 @@ class Patient {
     public String getState() {
         return state;
     }
-
     public Stack<String> getChangeHistory() {
         return changeHistory;
     }
-
     public void setArea(String area) {
         this.area = area;
     }
-
+    
     public void setCategory(int newCategory) {
         this.categoria = newCategory;
         recordChange("Categoria cambiada a C" + newCategory);
     }
+    
     public void setState(String newState) {
         List<String> EV = Arrays.asList("En atencion", "Atendido");//estados validos
         if(EV.contains(newState)){
@@ -81,10 +80,7 @@ class Patient {
             throw new IllegalArgumentException("Estado invalido");
         }
     }
-
-    public String fullName() {
-        return name + " " + lastName;
-    }
+    
     public long currentTimeout() {
         return (long) (System.currentTimeMillis() - arrivalTime) / 60000;
 
@@ -102,4 +98,3 @@ class Patient {
         }
     }
 }
-
