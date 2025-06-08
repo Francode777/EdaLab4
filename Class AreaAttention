@@ -10,12 +10,6 @@ public class AreaAttention {
     private PriorityQueue<Patient> patientHeap;//mantiene los paciente ordenados por orden de llegada y urgencia --> atento con esto
     private int maxCapacity;
 
-    // usaré compare, entonces tengo que crear otra clase artificial
-
-    //-1 es p1 va antes que p2
-    //1 es p2 va antes que p1
-    //en caso de ser iguales seria 0, pero vamos a resolverlo con su orden de llegada, o sea, viendo que quien lleva mas tiempo esperando
-
     Comparator<Patient> c = new Comparator<Patient>() {//evaluar los peores caso para el informe
         public int compare(Patient p1, Patient p2) {
             if (p1.getCategoria() < p2.getCategoria()) {
@@ -35,21 +29,6 @@ public class AreaAttention {
             }
         }
     };
-
-
-   /*
-este es un ejemplo de como se veria el heap, podemos ver que el Fran es el que esta con mas urgencia con C1 y un tiempo de llegada
-anterior a los demas a pesar de que Guliano por ejemplo tenga su misma categoria de urgencia. Por ende al hacer el poll() mandará la cabeza,
-que es Fran con C1 y su tiempo de llegada inferior al de Guliano.
-
-
-              Fran (C1, 900)
-            /               \
-   Guliano (C1, 950)     Javiera (C3, 1000)
-                          /
-              Nasheee (C4, 1010)
-
-    */
 
     public AreaAttention(String name, int maxCapacity) {// la cola para las pruebas se lo podemos dar de antemano ahi veremos
         this.name = name;
@@ -80,13 +59,7 @@ que es Fran con C1 y su tiempo de llegada inferior al de Guliano.
         while (!aux.isEmpty()) {
             ordenados.add(aux.poll()); //ahora al ser una lista se usa add, offer solo usamos en colas
         }
-
         return ordenados;
     }
 
 }
-
-
-// obs mia, no tomar en cuenta:quiero revisar el heap y el compare
-
-
