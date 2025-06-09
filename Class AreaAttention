@@ -40,13 +40,18 @@ public class AreaAttention {
         if (thisSaturade()) {
             System.out.println("Se alcanzó la capacidad maxima en el área" + name);
         }else{//usaré offer en vez de add para que devuelva false en caso de que no se agregue en vez de que el code se rompa por un error
+            paciente.setState("En atencion");
             patientHeap.offer(paciente);
         }
     }
     public Patient attendPatient() {
-        Patient p = patientHeap.peek();
+        if (patientHeap.isEmpty())
+            return null;
+
+        Patient p = patientHeap.poll(); // saca el primero
         p.setState("Atendido");
-        return patientHeap.poll();
+        p.recordChange("Paciente atendido desde área " + name);
+        return p;
     }
     public boolean thisSaturade() {
         return patientHeap.size() >= maxCapacity;
@@ -60,6 +65,16 @@ public class AreaAttention {
             ordenados.add(aux.poll()); //ahora al ser una lista se usa add, offer solo usamos en colas
         }
         return ordenados;
+    }
+
+    //metodos adicionales para la simulacion
+
+    public void removePatient(Patient paciente) {
+        patientHeap.remove(paciente);
+    }
+
+    public boolean isEmpty() {
+        return patientHeap.isEmpty();
     }
 
 }
