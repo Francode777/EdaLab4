@@ -65,12 +65,12 @@ class Patient {
     public void setArea(String area) {
         this.area = area;
     }
-    
+
     public void setCategory(int newCategory) {
         this.categoria = newCategory;
         recordChange("Categoria cambiada a C" + newCategory);
     }
-    
+
     public void setState(String newState) {
         List<String> EV = Arrays.asList("En atencion", "Atendido");//estados validos
         if(EV.contains(newState)){
@@ -80,7 +80,7 @@ class Patient {
             throw new IllegalArgumentException("Estado invalido");
         }
     }
-    
+
     public long currentTimeout() {
         return (long) (System.currentTimeMillis() - arrivalTime) / 60000;
 
@@ -97,4 +97,8 @@ class Patient {
             return "No se encuentran cambios disponibles";
         }
     }
+    //para la simulacion
+
+
+
 }
