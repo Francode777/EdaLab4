@@ -1,52 +1,56 @@
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.FileWriter;
+
 public class EmergencySimulation{
 
     private List<Patient> randomPatient = GeneratePatient.leerDatos("simulacion.txt");
     private final long addInterval;
     private final long attendInterval;
-
+    private Hospital quilicura;
     public EmergencySimulation() {
-        this(2 * 1000L, 3 * 1000L);
+        this.addInterval = 10 * 1000L;
+        this.attendInterval = 15 * 1000L;
     }
 
-    public EmergencySimulation(long addInterval, long attendInterval) {
-        this.addInterval = addInterval;
-        this.attendInterval = attendInterval;
-    }
-
-
-    public void simulator(){// integra y atiende paciente en los tiempos indicados
+    public void simulator(int pacientesPorDia){// colocar cantidad de paciente que se quieren atender
 
         SimpleDateFormat formato= new SimpleDateFormat("HH:mm:ss");//formato.format(currentTime) -> Para mostrar en hh:mm:ss
 
-
         long minute = 60 * 1000;
-        long interval_24H =  60 * minute;//24*60*minute
-        //ong addInterval = 10 * minute;
-        //long attendInterval = 15 * minute;
-
+        long interval_24H =  24 * minute;
 
         long startTime = System.currentTimeMillis();//Tiempo de partida
         long lastPatientAdded = startTime;
         long lastPatientAttended = startTime;
 
-        Hospital quilicura = new Hospital();
+        this.quilicura = new Hospital();
+        quilicura.setSimulationStartTime(startTime);// necesario para saber cuando llegan los pacientes
 
+        for (AreaAttention area : quilicura.getAreas().values()) {
+            area.setSimulationStartTime(startTime);
+        }
+
+        int atendidos = 0;
         int c = 0;
 
-        while (System.currentTimeMillis() - startTime < minute) {
+        while (System.currentTimeMillis() - startTime < interval_24H && atendidos < pacientesPorDia) {
             long currentTime = System.currentTimeMillis(); // Tiempo transcurrido
 
             if (currentTime - lastPatientAdded >= addInterval) { // cada 10 min (registra)
 
-                if(c<randomPatient.size()){
+                if(c < randomPatient.size()){
                     Patient patient = randomPatient.get(c);
-                    if (currentTime >= patient.getArrivalTime()) {
+                    long tiempoSimulado = currentTime - startTime;
+
+                    if (tiempoSimulado >= patient.getArrivalOffset()) {
                         quilicura.registerPatient(patient);
                         c++;
-                        System.out.println("[REGISTRO] Paciente " + patient.getFullName() + " registrado a las " + formato.format(currentTime));
+                        System.out.println("[REGISTRO] Paciente " + patient.getFullName() + " registrado a los " + (tiempoSimulado / 1000) + " segundos");
                     }
                 }else{
                     System.out.println("No se encuentran mas pacientes");
@@ -59,7 +63,16 @@ public class EmergencySimulation{
                     List<Patient> pacientesExcedidos = quilicura.obtenerPacientesExcedidos();
 
                     if (!pacientesExcedidos.isEmpty()) {
-                        quilicura.forzarAtencion(pacientesExcedidos.get(0));
+                        Patient p = pacientesExcedidos.get(0);
+
+                        long tiempoSimulado = System.currentTimeMillis() - startTime;
+                        long tiempoEsperando = tiempoSimulado - p.getArrivalOffset();
+                        long tiempoMaximo = Hospital.getMaxWaitTimeByCategory(p.getCategoria());
+
+                        System.out.println("[DEBUG] Paciente " + p.getID() +
+                                " esperando " + tiempoEsperando + " ms, límite = " + tiempoMaximo);
+
+                        quilicura.forzarAtencion(p);
                     } else {
                         // Asignar pacientes desde la cola general
                         if (quilicura.getAttentionQueue().size() >= 3) {
@@ -77,7 +90,10 @@ public class EmergencySimulation{
                         if (area != null && !area.isEmpty()) {
                             Patient atendido = area.attendPatient();
                             long tiempoEspera = atendido.currentTimeout();//**
-                            quilicura.registrarAtencion(atendido);
+                            if (atendido != null) {
+                                quilicura.registrarAtencion(atendido);
+                                atendidos++;
+                            }
                         }
                     }
 
@@ -89,17 +105,39 @@ public class EmergencySimulation{
 
             // Pequeña pausa para no saturar la CPU
             try {
-                Thread.sleep(100); // espera un minuto
+                Thread.sleep(1000); // espera un minuto
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
+    public void guardarTiemposAtencion(String archivo) {
+        try (FileWriter writer = new FileWriter(archivo)) {
+            writer.write("ID,Nombre,Categoría,Tiempo de Espera (segundos)\n");
 
+            for (Patient p : quilicura.getAtendidos()) {
+                writer.write(p.getID() + "," + p.getFullName() + "," +
+                        p.getCategoria() + "," + (p.getWaitingTime() / 1000) + "\n");
+            }
+
+            System.out.println("Archivo con tiempos de atención guardado: " + archivo);
+
+        } catch (IOException e) {
+            System.err.println("Error al guardar tiempos de atención: " + e.getMessage());
+        }
+    }
     public static void main(String[] args) {
 
         EmergencySimulation sim = new EmergencySimulation();
-        sim.simulator();
+        sim.simulator(100);
+
+        sim.guardarTiemposAtencion("tiempos_atencion.csv");
+        /**Para mostrar el tiempo que se demoro en atender a cada paciente
+          for (Patient p : quilicura.getAtendidos()) {
+            System.out.println("Paciente " + p.getID() + " fue atendido tras esperar " + (p.getWaitingTime() / 1000) + " segundos");
+         }
+         **/
+
 
     }
 
