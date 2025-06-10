@@ -1,110 +1,112 @@
-import java.util.*;
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.FileWriter;
 
+public class GeneratePatient {
 
-class Patient {
-    private String name;
-    private String lastName;
-    private String ID; //rut
-    private int categoria; // del 1 al 5 C1-C5
-    private long arrivalOffset;
-    private String state;
-    private String area;
-    private Stack<String> changeHistory;//registro cambios en estado o categoria
-    private long waitingTime; //simulacion
-    Patient(String name, String lastName, String ID, long arrivalOffset) {
-        this.name = name;
-        this.lastName = lastName;
-        this.ID = ID;
-        this.arrivalOffset = arrivalOffset;
-        this.state = "En espera";
-        this.area = "Sin asignar";
-        this.changeHistory = new Stack<>();
-        Random rand = new Random();
+    private static String[] names = {
+            "Guliano", "Javiera", "Francisco", "Benjamin", "Ronal",
+            "Samuel", "Agustin", "Lucía", "Diego", "Camila",
+            "Mateo", "Valentina", "Andrés", "Cristian", "Tomás",
+            "Elena", "Gabriel", "Isabella", "Samuel", "Martina"
+    };
+    private static String[] lastNames = {
+            "Bardi", "Olguin", "Gatica", "López", "Martínez",
+            "Sánchez", "Ramírez", "Cruz", "Olmos", "Díaz",
+            "Torres", "Vargas", "Castillo", "Morales", "Ortiz",
+            "Flores", "Ruiz", "Medina", "Herrera", "Silva"
+    };
+    private static String[] areas = {
+            "SAPU", "Urgencia Adulto", "Infantil"
+    };
+    private static String prefijo = "A";
+    private static int counter = 1;
+    private static Random random = new Random();
 
-        int rango = rand.nextInt(1, 101);
+    public static List<Patient> generatePatient(int cantidad) {
 
-        if (rango <= 10)// 10%
-            this.categoria = 1;
-        else if (rango <= 25)// 15%
-            this.categoria = 2;
-        else if (rango <= 43)// 18%
-            this.categoria = 3;
-        else if (rango <= 70)// 27%
-            this.categoria = 4;
-        else // 30%
-            this.categoria = 5;
+        List<Patient> patientsRandom = new ArrayList<>();
 
-    }
-    public String getName() {
-        return name;
-    }
-    public String getLastName() {
-        return lastName;
-    }
-    public String getFullName() {
-        return name + " " + lastName;
-    }
-    public String getID() {
-        return ID;
-    }
-    public int getCategoria() {
-        return categoria;
-    }
-    public long getArrivalOffset() {
-        return arrivalOffset;
-    }
-    public long getWaitingTime() {//para simulacion
-        return waitingTime;
-    }
-    public String getArea() {
-        return area;
-    }
-    public String getState() {
-        return state;
-    }
-    public Stack<String> getChangeHistory() {
-        return changeHistory;
-    }
-    public void setArea(String area) {
-        this.area = area;
+        long intervalo = 10 * 1000L;
+
+        for (int i = 1; i <= cantidad; i++) {
+
+            String name= names[random.nextInt(names.length)];
+            String lastname = lastNames[random.nextInt(lastNames.length)];
+            String id = prefijo + String.format("%04d",counter);
+            long arrivalOffset = (i - 1) * intervalo; //timestamp_inicio + (i * 10 * 60* 1000);
+
+            Patient p = new Patient(name, lastname, id, arrivalOffset);
+            patientsRandom.add(p);
+
+            counter++;
+        }
+
+        return patientsRandom;
     }
 
-    public void setCategory(int newCategory) {
-        this.categoria = newCategory;
-        recordChange("Categoria cambiada a C" + newCategory);
-    }
+    public static void guardarDatos(List<Patient> patients, String nombreArchivo) {
 
-    public void setState(String newState) {
-        List<String> EV = Arrays.asList("En atencion", "Atendido");//estados validos
-        if(EV.contains(newState)){
-            this.state = newState;
-            recordChange("Estado cambiada a " + newState);
-        }else{
-            throw new IllegalArgumentException("Estado invalido");
+        try(FileWriter writer = new FileWriter(nombreArchivo)) {
+
+            writer.write("Nombre, Apellido, Id, Tiempo de llegada \n");// encabezados de columans
+
+            for (Patient p : patients) {
+                writer.write(p.getName() + "," + p.getLastName() + "," +
+                        p.getID() + "," + p.getArrivalOffset() + "\n");
+            }
+
+            System.out.println("El Archivo " + nombreArchivo + " ha sido guardado correctamente.");
+
+        }catch(IOException e) {
+            System.err.println("Error al guardar el archivo: " + e.getMessage());
         }
     }
 
-    public void setWaitingTime(long waitingTime) {// para simulacion
-        this.waitingTime = waitingTime;
-    }
-    public long currentTimeout() {
-        return (long) (System.currentTimeMillis() - arrivalOffset) / 60000;
+    public static ArrayList<Patient> leerDatos(String nombreArchivo) {
 
-    }
+        ArrayList<Patient> patientRandom = new ArrayList<>();
 
-    public void recordChange(String descripcion){//cambia el historial del paciente
-        changeHistory.push(descripcion);//pila que registra cambios
-    }
+        try (BufferedReader br = new BufferedReader(new FileReader(nombreArchivo))) {// leer linea por linea
+            String linea = br.readLine();
 
-    public String getLastChange() {//obtiene y remueve el ultimo cambio
-        if (changeHistory.size() > 0) {
-            return changeHistory.pop();
-        } else {
-            return "No se encuentran cambios disponibles";
+            while ((linea = br.readLine()) != null) {
+                String[] parts = linea.split(",");
+
+                if (parts.length == 4) {
+                    String name = parts[0].trim();
+                    String lastname = parts[1].trim();
+                    String id = parts[2].trim();
+                    long arrivalTime = Long.parseLong(parts[3].trim());
+
+                    patientRandom.add(new Patient(name,lastname,id,arrivalTime));
+                }
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error al leer el archivo: " + e.getMessage());
         }
+        return patientRandom;
     }
-    //para la simulacion
+    public static void main(String[] args) {
 
+        List<Patient> listPatient = GeneratePatient.generatePatient(500);
+        guardarDatos(listPatient, "simulacion.txt");
 
+        /*
+        //para leer los juegos
+        List<Patient> patientList = GeneratePatient.leerDatos("Pacientes_24H.csv");
 
+        for (int i = 0; i < juegos.size(); i++) {
+            System.out.println((i + 1) + ") : " + juegos.get(i).imprimir());
+        }
+        */
+
+    }
 }
+
