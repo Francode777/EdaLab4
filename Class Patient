@@ -6,16 +6,16 @@ class Patient {
     private String lastName;
     private String ID; //rut
     private int categoria; // del 1 al 5 C1-C5
-    private long arrivalTime;
+    private long arrivalOffset;
     private String state;
     private String area;
     private Stack<String> changeHistory;//registro cambios en estado o categoria
-
-    Patient(String name, String lastName, String ID, long arrivalTime) {
+    private long waitingTime; //simulacion
+    Patient(String name, String lastName, String ID, long arrivalOffset) {
         this.name = name;
         this.lastName = lastName;
         this.ID = ID;
-        this.arrivalTime = arrivalTime;
+        this.arrivalOffset = arrivalOffset;
         this.state = "En espera";
         this.area = "Sin asignar";
         this.changeHistory = new Stack<>();
@@ -50,8 +50,11 @@ class Patient {
     public int getCategoria() {
         return categoria;
     }
-    public long getArrivalTime() {
-        return arrivalTime;
+    public long getArrivalOffset() {
+        return arrivalOffset;
+    }
+    public long getWaitingTime() {//para simulacion
+        return waitingTime;
     }
     public String getArea() {
         return area;
@@ -81,8 +84,11 @@ class Patient {
         }
     }
 
+    public void setWaitingTime(long waitingTime) {// para simulacion
+        this.waitingTime = waitingTime;
+    }
     public long currentTimeout() {
-        return (long) (System.currentTimeMillis() - arrivalTime) / 60000;
+        return (long) (System.currentTimeMillis() - arrivalOffset) / 60000;
 
     }
 
