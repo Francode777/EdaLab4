@@ -9,7 +9,7 @@ public class AreaAttention {
     private String name;
     private PriorityQueue<Patient> patientHeap;//mantiene los paciente ordenados por orden de llegada y urgencia --> atento con esto
     private int maxCapacity;
-
+    private long simulationStartTime;
     Comparator<Patient> c = new Comparator<Patient>() {//evaluar los peores caso para el informe
         public int compare(Patient p1, Patient p2) {
             if (p1.getCategoria() < p2.getCategoria()) {
@@ -18,10 +18,10 @@ public class AreaAttention {
             if (p1.getCategoria() > p2.getCategoria()) {
                 return 1;
             } else {//tienen la misma categoria, se resuelve en base a su orden de llegada
-                if (p1.getArrivalTime() < p2.getArrivalTime()) {//pendiente-> posible solucion crear un metodo que compare la horas
+                if (p1.getArrivalOffset() < p2.getArrivalOffset()) {//pendiente-> posible solucion crear un metodo que compare la horas
                     return -1;
                 }
-                if (p1.getArrivalTime() > p2.getArrivalTime()) {//pendiente
+                if (p1.getArrivalOffset() > p2.getArrivalOffset()) {//pendiente
                     return 1;
                 } else {
                     return 0;
@@ -48,9 +48,15 @@ public class AreaAttention {
         if (patientHeap.isEmpty())
             return null;
 
-        Patient p = patientHeap.poll(); // saca el primero
+        Patient p = patientHeap.peek(); // NO lo saques aún
+        long tiempoSimulado = System.currentTimeMillis() - simulationStartTime;
+        long waiting = tiempoSimulado - p.getArrivalOffset();
+        p.setWaitingTime(waiting);
+
+        p = patientHeap.poll(); // ahora sí lo sacas
         p.setState("Atendido");
         p.recordChange("Paciente atendido desde área " + name);
+
         return p;
     }
     public boolean thisSaturade() {
@@ -76,5 +82,7 @@ public class AreaAttention {
     public boolean isEmpty() {
         return patientHeap.isEmpty();
     }
-
+    public void setSimulationStartTime(long simulationStartTime) {
+        this.simulationStartTime = simulationStartTime;
+    }
 }
