@@ -95,10 +95,10 @@ public class EmergencySimulation{
                         // Asignar pacientes desde la cola general
                         if (quilicura.getAttentionQueue().size() >= 3) {
                             for (int i = 0; i < 2; i++) {
-                                quilicura.nextpatient(); // SOLO asignar
+                                quilicura.nextpatient(); 
                             }
                         } else if (!quilicura.getAttentionQueue().isEmpty()) {
-                            quilicura.nextpatient(); // SOLO asignar
+                            quilicura.nextpatient(); 
                         }
                     }
 
@@ -107,7 +107,7 @@ public class EmergencySimulation{
                         AreaAttention area = quilicura.getArea(areaName);
                         if (area != null && !area.isEmpty()) {
                             Patient atendido = area.attendPatient();
-                            long tiempoEspera = atendido.currentTimeout();//**
+                            long tiempoEspera = atendido.currentTimeout();
                             if (atendido != null) {
                                 quilicura.registrarAtencion(atendido);
                                 atendidos++;
@@ -146,8 +146,7 @@ public class EmergencySimulation{
     }
     public void mostrarCantidadPacientesPorCategoria() {
         Map<Integer, Integer> contadorPorCategoria = new HashMap<>();
-
-        // Inicializar contadores en 0 para cada categoria 1 a 5
+        
         for (int i = 1; i <= 5; i++) {
             contadorPorCategoria.put(i, 0);
         }
@@ -172,8 +171,8 @@ public class EmergencySimulation{
             esperaPorCategoria.putIfAbsent(cat, new long[]{0L, 0L});
             long[] sumaContador = esperaPorCategoria.get(cat);
 
-            sumaContador[0] += tiempo;   // suma de tiempos en ms
-            sumaContador[1] += 1;        // contador
+            sumaContador[0] += tiempo;  
+            sumaContador[1] += 1;        
         }
 
         System.out.println("Promedio de tiempo de espera por categoría:");
