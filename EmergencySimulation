@@ -5,7 +5,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileWriter;
-
+import java.util.Map;
+import java.util.HashMap;
 public class EmergencySimulation{
 
     private List<Patient> randomPatient = GeneratePatient.leerDatos("simulacion.txt");
@@ -27,6 +28,23 @@ public class EmergencySimulation{
         long startTime = System.currentTimeMillis();//Tiempo de partida
         long lastPatientAdded = startTime;
         long lastPatientAttended = startTime;
+        // pruebas
+        Patient pacienteC4 = null;
+        for (Patient p : randomPatient) {
+            if (p.getCategoria() == 4) {
+                pacienteC4 = p;
+                break;
+            }
+        }
+        if (pacienteC4 == null) {
+            System.out.println("No hay pacientes C4 en los datos de simulación.");
+            return;
+        }
+        String idC4 = pacienteC4.getID();
+        long registroOffsetC4 = -1;   // para guardar el offset simulado al registrarlo
+        boolean c4Atendido = false;
+        long tiempoEsperaC4 = -1;
+        //pruebas
 
         this.quilicura = new Hospital();
         quilicura.setSimulationStartTime(startTime);// necesario para saber cuando llegan los pacientes
@@ -102,6 +120,8 @@ public class EmergencySimulation{
                     System.out.println("No hay pacientes registrados.");
                 }
             }
+
+            // Pequeña pausa para no saturar la CPU
             try {
                 Thread.sleep(1000); // espera un minuto
             } catch (InterruptedException e) {
@@ -124,12 +144,62 @@ public class EmergencySimulation{
             System.err.println("Error al guardar tiempos de atención: " + e.getMessage());
         }
     }
+    public void mostrarCantidadPacientesPorCategoria() {
+        Map<Integer, Integer> contadorPorCategoria = new HashMap<>();
+
+        // Inicializar contadores en 0 para cada categoria 1 a 5
+        for (int i = 1; i <= 5; i++) {
+            contadorPorCategoria.put(i, 0);
+        }
+
+        for (Patient p : quilicura.getAtendidos()) {
+            int cat = p.getCategoria();
+            contadorPorCategoria.put(cat, contadorPorCategoria.get(cat) + 1);
+        }
+
+        System.out.println("Cantidad de pacientes atendidos por categoría:");
+        for (int i = 1; i <= 5; i++) {
+            System.out.println("Categoría C" + i + ": " + contadorPorCategoria.get(i));
+        }
+    }
+    public void mostrarPromedioEsperaPorCategoria() {
+        Map<Integer, long[]> esperaPorCategoria = new HashMap<>();
+
+        for (Patient p : quilicura.getAtendidos()) {
+            int cat = p.getCategoria();
+            long tiempo = p.getWaitingTime();
+
+            esperaPorCategoria.putIfAbsent(cat, new long[]{0L, 0L});
+            long[] sumaContador = esperaPorCategoria.get(cat);
+
+            sumaContador[0] += tiempo;   // suma de tiempos en ms
+            sumaContador[1] += 1;        // contador
+        }
+
+        System.out.println("Promedio de tiempo de espera por categoría:");
+        for (Map.Entry<Integer, long[]> entry : esperaPorCategoria.entrySet()) {
+            int categoria = entry.getKey();
+            long[] sumaContador = entry.getValue();
+            long suma = sumaContador[0];
+            long count = sumaContador[1];
+
+            double promedioSegundos = (double) suma / count / 1000.0; // ms a segundos
+
+            System.out.printf("Categoría C%d: %.2f segundos%n", categoria, promedioSegundos);
+        }
+    }
+    public List reportePacientesExcedidos() {
+        List<Patient> pacientesExcedidos = quilicura.obtenerPacientesExcedidos();
+        return List.of();
+    }
     public static void main(String[] args) {
 
         EmergencySimulation sim = new EmergencySimulation();
         sim.simulator(100);
-
         sim.guardarTiemposAtencion("tiempos_atencion.csv");
+        sim.mostrarCantidadPacientesPorCategoria();
+        sim.mostrarPromedioEsperaPorCategoria();
+        sim.reportePacientesExcedidos();
         /**Para mostrar el tiempo que se demoro en atender a cada paciente
           for (Patient p : quilicura.getAtendidos()) {
             System.out.println("Paciente " + p.getID() + " fue atendido tras esperar " + (p.getWaitingTime() / 1000) + " segundos");
@@ -140,3 +210,4 @@ public class EmergencySimulation{
     }
 
 }
+
