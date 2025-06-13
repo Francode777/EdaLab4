@@ -103,7 +103,7 @@ class Patient {
             return "No se encuentran cambios disponibles";
         }
     }
-    //para la simulacion
+    
 
 
 
